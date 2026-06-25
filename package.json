@@ -1,0 +1,10 @@
+{
+  "name": "pavia-v2",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'Building Pavia...'"
+  },
+  "dependencies": {
+    "wouter": "^2.11.0"
+  }
+}
