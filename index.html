@@ -1,13 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pavia Financial</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-[#0A0E17]">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0A0E17] text-white min-h-screen">
     <div id="root"></div>
-    <!-- We'll link a quick script here or bundle it directly -->
-  </body>
+
+    <script type="text/babel">
+        // --- 1. STATE MANAGEMENT ---
+        function App() {
+            const [page, setPage] = React.useState('landing'); // 'landing', 'login', 'dashboard'
+
+            if (page === 'login') {
+                return <Login onLoginSuccess={() => setPage('dashboard')} onBack={() => setPage('landing')} />;
+            }
+            if (page === 'dashboard') {
+                return <Dashboard onLogout={() => setPage('landing')} />;
+            }
+
+            return (
+                <div class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-12 h-12 rounded-full bg-[#00E5A3] flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,229,163,0.3)]">
+                        <span class="text-[#0A0E17] font-black text-xl">P</span>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 font-display">
+                        Pavia <span class="text-[#00E5A3]">Financial</span>
+                    </h1>
+                    <p class="text-gray-400 max-w-sm mb-8 text-sm md:text-base leading-relaxed">
+                        Premium capital management, rent financing, and workspace access built for the next generation of Ghanaian builders.
+                    </p>
+                    <button 
+                        onClick={() => setPage('login')}
+                        class="px-8 py-3.5 bg-[#00E5A3] text-[#0A0E17] font-semibold rounded-xl hover:bg-[#00c28a] transition-all duration-200 shadow-lg shadow-[0_4px_20px_rgba(0,229,163,0.2)] active:scale-98 text-sm"
+                    >
+                        Enter Portal
+                    </button>
+                </div>
+            );
+        }
+
+        // --- 2. LOGIN COMPONENT ---
+        function Login({ onLoginSuccess, onBack }) {
+            const [username, setUsername] = React.useState('');
+            const [password, setPassword] = React.useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (username.trim() && password.trim()) {
+                    onLoginSuccess();
+                }
+            };
+
+            return (
+                <div class="min-h-screen flex flex-col items-center justify-center p-6">
+                    <div class="w-full max-w-md bg-[#121824] border border-gray-800 rounded-2xl p-8 shadow-2xl">
+                        <button onClick={onBack} class="text-xs text-gray-400 hover:text-[#00E5A3] mb-6 flex items-center gap-1">
+                            ← Back
+                        </button>
+                        <h2 class="text-2xl font-bold text-white mb-2">Welcome Back</h2>
+                        <p class="text-gray-400 text-xs mb-6">Enter your credentials to access the Pavia ecosystem.</p>
+                        
+                        <form onSubmit={handleSubmit} class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-1.5">Username / Email</label>
+                                <input type="text" required value={username} onChange={e => setUsername(e.target.value)} class="w-full bg-[#0A0E17] border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00E5A3] transition-colors" placeholder="Enter username" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-1.5">Password</label>
+                                <input type="password" required value={password} onChange={e => setPassword(e.target.value)} class="w-full bg-[#0A0E17] border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00E5A3] transition-colors" placeholder="••••••••" />
+                            </div>
+                            <button type="submit" class="w-full bg-[#00E5A3] text-[#0A0E17] font-semibold py-3 rounded-xl hover:bg-[#00c28a] transition-colors mt-2 text-sm">
+                                Sign In
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 3. DASHBOARD COMPONENT ---
+        function Dashboard({ onLogout }) {
+            return (
+                <div class="min-h-screen bg-[#0A0E17]">
+                    {/* Header */}
+                    <nav class="border-b border-gray-800 bg-[#121824] px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-full bg-[#00E5A3] flex items-center justify-center">
+                                <span class="text-[#0A0E17] font-black text-xs">P</span>
+                            </div>
+                            <span class="font-bold tracking-tight text-sm">Pavia</span>
+                        </div>
+                        <button onClick={onLogout} class="text-xs font-medium text-gray-400 hover:text-red-400 transition-colors">
+                            Logout
+                        </button>
+                    </nav>
+
+                    {/* Content */}
+                    <div class="max-w-6xl mx-auto p-6 space-y-6">
+                        <div class="bg-gradient-to-r from-[#121824] to-[#16222f] border border-gray-800 rounded-2xl p-6 md:p-8">
+                            <span class="text-xs font-medium text-[#00E5A3] tracking-wider uppercase">Active Portfolio</span>
+                            <h1 class="text-3xl md:text-4xl font-bold mt-1 text-white">₵24,500.00</h1>
+                            <p class="text-xs text-gray-400 mt-1">Available Liquidity & Rent Capital Credits</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-[#121824] border border-gray-800 rounded-xl p-5">
+                                <h3 class="text-sm font-semibold mb-3 text-gray-300">Quick Actions</h3>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button class="bg-[#0A0E17] border border-gray-800 hover:border-[#00E5A3] p-3 rounded-lg text-left text-xs transition-colors">
+                                        <div class="text-[#00E5A3] mb-1 font-bold"> Rent Credit</div>
+                                        Apply for financing
+                                    </button>
+                                    <button class="bg-[#0A0E17] border border-gray-800 hover:border-[#00E5A3] p-3 rounded-lg text-left text-xs transition-colors">
+                                        <div class="text-[#00E5A3] mb-1 font-bold">⚡ Pay Invoice</div>
+                                        Instant disbursement
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#121824] border border-gray-800 rounded-xl p-5">
+                                <h3 class="text-sm font-semibold mb-3 text-gray-300">System Parameters</h3>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Escrow Status</span><span class="text-[#00E5A3] font-medium">Secured</span></div>
+                                    <div class="flex justify-between py-1 border-b border-gray-900"><span class="text-gray-400">Network Node</span><span class="text-white">Accra-Central</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
 </html>
