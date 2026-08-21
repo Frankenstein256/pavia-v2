@@ -1,3 +1,5 @@
+import { Providers } from './providers';
+
 export const metadata = {
   title: 'Pavia v2',
   description: 'Pavia rebuild on Next.js',
@@ -6,7 +8,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
