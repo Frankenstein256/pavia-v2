@@ -66,3 +66,22 @@ model SkillListing {
   updatedAt   DateTime @updatedAt
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+model Conversation {
+  id          String    @id @default(cuid())
+  listingId   String
+  buyerId     String
+  sellerId    String
+  createdAt   DateTime  @default(now())
+  messages    Message[]
+
+  @@unique([listingId, buyerId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
