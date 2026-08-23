@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 
 export default async function WorkPage() {
   const listings = await prisma.skillListing.findMany({
