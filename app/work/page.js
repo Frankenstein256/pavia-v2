@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import MessageButton from './MessageButton';
 export const dynamic = 'force-dynamic';
 
 export default async function WorkPage() {
@@ -34,6 +35,7 @@ export default async function WorkPage() {
             <p style={{ fontSize: '0.85rem', color: '#999', marginTop: '0.5rem' }}>
               Posted by {listing.user?.name || 'Anonymous'}
             </p>
+              <MessageButton listingId={listing.id} />
           </div>
         ))}
       </div>
