@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function ChatPage() {
   const params = useParams();
+  const { data: session } = useSession();
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
@@ -56,12 +58,25 @@ export default function ChatPage() {
 
       <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', minHeight: '300px', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {messages.length === 0 && <p style={{ color: '#999' }}>No messages yet. Say hello.</p>}
-        {messages.map((m) => (
-          <div key={m.id} style={{ background: '#f2f2f2', borderRadius: '6px', padding: '0.5rem 0.75rem', alignSelf: 'flex-start', maxWidth: '80%' }}>
-            {m.content}
-          </div>
-        ))}
-      </div>
+          {messages.map((m) => {
+          const isMine = m.senderId === session?.user?.id;
+          return (
+            <div
+              key={m.id}
+              style={{
+                background: isMine ? '#0F5132' : '#f2f2f2',
+                color: isMine ? 'white' : '#1A1A1A',
+                borderRadius: '12px',
+                padding: '0.5rem 0.85rem',
+                alignSelf: isMine ? 'flex-end' : 'flex-start',
+                maxWidth: '75%',
+              }}
+            >
+              {m.content}
+            </div>
+          );
+        })}
+        
 
       <form onSubmit={handleSend} style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
         <input
