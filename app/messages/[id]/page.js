@@ -58,7 +58,7 @@ export default function ChatPage() {
 
       <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', minHeight: '300px', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {messages.length === 0 && <p style={{ color: '#999' }}>No messages yet. Say hello.</p>}
-          {messages.map((m) => {
+        {messages.map((m) => {
           const isMine = m.senderId === session?.user?.id;
           return (
             <div
@@ -76,7 +76,7 @@ export default function ChatPage() {
             </div>
           );
         })}
-        
+      </div>
 
       <form onSubmit={handleSend} style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
         <input
