@@ -30,6 +30,9 @@ export default function Navbar() {
           <Link href="/save" style={{ textDecoration: 'none', color: '#1A1A1A' }}>
   Save
 </Link>
+    <Link href="/rent" style={{ textDecoration: 'none', color: '#1A1A1A' }}>
+  Rent
+</Link>
     </nav>
   );
   }
