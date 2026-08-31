@@ -12,6 +12,7 @@ export default function RentPage() {
   const [price, setPrice] = useState('');
   const [location, setLocation] = useState('');
   const [photoUrls, setPhotoUrls] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -26,6 +27,35 @@ export default function RentPage() {
       setListings(data);
     }
     setLoading(false);
+  }
+
+  async function handlePhotoChange(e) {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setUploading(true);
+    setError('');
+    const uploadedUrls = [];
+
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        uploadedUrls.push(data.url);
+      } else {
+        setError('Failed to upload one or more photos');
+      }
+    }
+
+    setPhotoUrls((prev) => (prev ? prev + ',' + uploadedUrls.join(',') : uploadedUrls.join(',')));
+    setUploading(false);
   }
 
   async function handleCreate(e) {
@@ -77,37 +107,9 @@ export default function RentPage() {
           </select>
           <input type="number" placeholder="Price per month (GHS)" value={price} onChange={(e) => setPrice(e.target.value)} required style={{ padding: '0.6rem' }} />
           <input type="text" placeholder="Location (e.g. East Legon)" value={location} onChange={(e) => setLocation(e.target.value)} required style={{ padding: '0.6rem' }} />
-          <input type="text" placeholder="Photo URL(s), comma separated" value={photoUrls} onChange={(e) => setPhotoUrls(e.target.value)} style={{ padding: '0.6rem' }} />
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          <button type="submit" disabled={creating} style={{ padding: '0.7rem', cursor: 'pointer' }}>
-            {creating ? 'Posting...' : 'Post listing'}
-          </button>
-        </form>
-      )}
 
-      <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {listings.length === 0 && <p>No listings yet.</p>}
-
-        {listings.map((listing) => {
-          const photos = listing.photoUrls ? listing.photoUrls.split(',').map((p) => p.trim()) : [];
-          return (
-            <div key={listing.id} style={{ border: '1px solid #ddd', borderRadius: '10px', padding: '1rem' }}>
-              {photos[0] && (
-                <img src={photos[0]} alt={listing.title} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '0.5rem' }} />
-              )}
-              <h3 style={{ margin: 0 }}>{listing.title}</h3>
-              <p style={{ color: '#666', margin: '0.3rem 0' }}>
-                {listing.type === 'room' ? 'Room' : 'Whole place'} · {listing.location}
-              </p>
-              <p style={{ margin: '0.5rem 0' }}>{listing.description}</p>
-              <p style={{ fontWeight: 'bold', margin: 0 }}>GHS {listing.price}/month</p>
-              <p style={{ fontSize: '0.85rem', color: '#999', marginTop: '0.5rem' }}>
-                Posted by {listing.user?.name || 'Anonymous'}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-    </main>
-  );
-    }
+          <label style={{ fontSize: '0.9rem', color: '#666' }}>Photos</label>
+          <input type="file" accept="image/*" multiple onChange={handlePhotoChange} style={{ padding: '0.4rem' }} />
+          {uploading && <p style={{ color: '#666' }}>Uploading...</p>}
+          {photoUrls && (
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
