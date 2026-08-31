@@ -113,3 +113,42 @@ export default function RentPage() {
           {uploading && <p style={{ color: '#666' }}>Uploading...</p>}
           {photoUrls && (
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {photoUrls.split(',').map((url, i) => (
+                <img key={i} src={url} alt="preview" style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '6px' }} />
+              ))}
+            </div>
+          )}
+
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          <button type="submit" disabled={creating || uploading} style={{ padding: '0.7rem', cursor: 'pointer' }}>
+            {creating ? 'Posting...' : 'Post listing'}
+          </button>
+        </form>
+      )}
+
+      <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {listings.length === 0 && <p>No listings yet.</p>}
+
+        {listings.map((listing) => {
+          const photos = listing.photoUrls ? listing.photoUrls.split(',').map((p) => p.trim()) : [];
+          return (
+            <div key={listing.id} style={{ border: '1px solid #ddd', borderRadius: '10px', padding: '1rem' }}>
+              {photos[0] && (
+                <img src={photos[0]} alt={listing.title} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '0.5rem' }} />
+              )}
+              <h3 style={{ margin: 0 }}>{listing.title}</h3>
+              <p style={{ color: '#666', margin: '0.3rem 0' }}>
+                {listing.type === 'room' ? 'Room' : 'Whole place'} · {listing.location}
+              </p>
+              <p style={{ margin: '0.5rem 0' }}>{listing.description}</p>
+              <p style={{ fontWeight: 'bold', margin: 0 }}>GHS {listing.price}/month</p>
+              <p style={{ fontSize: '0.85rem', color: '#999', marginTop: '0.5rem' }}>
+                Posted by {listing.user?.name || 'Anonymous'}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </main>
+  );
+  }
