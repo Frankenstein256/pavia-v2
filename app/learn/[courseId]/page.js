@@ -3,11 +3,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
-function getYouTubeEmbedUrl(url) {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
-  return match ? `https://www.youtube.com/embed/${match[1]}` : url;
-}
-
 export default function CoursePage() {
   const { courseId } = useParams();
   const { data: session } = useSession();
@@ -86,14 +81,11 @@ export default function CoursePage() {
 
       {session && enrollment && (
         <>
-          <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, marginBottom: 16 }}>
-            <iframe
-              src={getYouTubeEmbedUrl(course.videoUrl)}
-              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-              frameBorder="0"
-              allowFullScreen
-            />
-          </div>
+          <video
+            src={course.videoUrl}
+            controls
+            style={{ width: '100%', marginBottom: 16, backgroundColor: '#000' }}
+          />
 
           {!enrollment.videoWatched && (
             <button onClick={handleMarkWatched} style={{ padding: '10px 20px', marginBottom: 24 }}>
@@ -141,4 +133,4 @@ export default function CoursePage() {
       )}
     </div>
   );
-}
+        }
