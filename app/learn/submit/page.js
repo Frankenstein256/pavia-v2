@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { upload } from '@vercel/blob/client';
 
 export default function SubmitCoursePage() {
   const { data: session } = useSession();
@@ -9,12 +10,14 @@ export default function SubmitCoursePage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
+  const [videoFile, setVideoFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [questions, setQuestions] = useState([
     { text: '', options: ['', '', '', ''], correctIndex: 0 },
   ]);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [statusText, setStatusText] = useState('');
 
   function updateQuestion(i, field, value) {
     const updated = [...questions];
@@ -40,24 +43,40 @@ export default function SubmitCoursePage() {
       setError('Please log in first.');
       return;
     }
-    if (!title || !description || !videoUrl) {
-      setError('Please fill in title, description, and video URL.');
+    if (!title || !description || !videoFile) {
+      setError('Please fill in title, description, and choose a video file.');
       return;
     }
 
     setSubmitting(true);
-    const res = await fetch('/api/courses', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, category, videoUrl, questions }),
-    });
-    setSubmitting(false);
 
-    if (res.ok) {
-      router.push('/learn');
-    } else {
-      setError('Failed to submit course.');
+    try {
+      setStatusText('Uploading video...');
+      const blob = await upload(videoFile.name, videoFile, {
+        access: 'public',
+        handleUploadUrl: '/api/video-upload',
+        onUploadProgress: (progress) => {
+          setUploadProgress(Math.round(progress.percentage));
+        },
+      });
+
+      setStatusText('Saving course...');
+      const res = await fetch('/api/courses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, category, videoUrl: blob.url, questions }),
+      });
+
+      if (res.ok) {
+        router.push('/learn');
+      } else {
+        setError('Failed to submit course.');
+      }
+    } catch (err) {
+      setError('Upload failed: ' + err.message);
     }
+
+    setSubmitting(false);
   }
 
   return (
@@ -68,7 +87,14 @@ export default function SubmitCoursePage() {
         <input placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 8 }} />
         <textarea placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 8 }} />
         <input placeholder="Category (optional)" value={category} onChange={e => setCategory(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 8 }} />
-        <input placeholder="Unlisted YouTube video URL" value={videoUrl} onChange={e => setVideoUrl(e.target.value)} style={{ width: '100%', marginBottom: 20, padding: 8 }} />
+
+        <label style={{ display: 'block', marginBottom: 6 }}>Course Video (max 300MB)</label>
+        <input
+          type="file"
+          accept="video/mp4,video/quicktime,video/webm,video/x-matroska"
+          onChange={e => setVideoFile(e.target.files[0])}
+          style={{ width: '100%', marginBottom: 20 }}
+        />
 
         <h3>Test Questions</h3>
         {questions.map((q, i) => (
@@ -101,6 +127,9 @@ export default function SubmitCoursePage() {
         <button type="button" onClick={addQuestion} style={{ marginBottom: 20 }}>+ Add Question</button>
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
+        {submitting && (
+          <p>{statusText} {uploadProgress > 0 && videoFile ? `(${uploadProgress}%)` : ''}</p>
+        )}
 
         <button type="submit" disabled={submitting} style={{ width: '100%', padding: 12 }}>
           {submitting ? 'Submitting...' : 'Submit Course for Review'}
@@ -108,4 +137,4 @@ export default function SubmitCoursePage() {
       </form>
     </div>
   );
-    }
+  }
