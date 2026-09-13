@@ -16,28 +16,56 @@ export default function LearnPage() {
   }, []);
 
   return (
-    <div style={{ maxWidth: 800, margin: '40px auto', padding: '0 16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1>Learn</h1>
+    <div style={{ maxWidth: 800, margin: '0 auto', padding: '2rem 1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h1 style={{ margin: 0, color: 'var(--color-primary)' }}>Learn</h1>
         <Link href="/learn/submit">
-          <button style={{ padding: '8px 16px' }}>+ Submit a Course</button>
+          <button style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem' }}>+ Submit a Course</button>
         </Link>
       </div>
 
-      {loading && <p>Loading courses...</p>}
-      {!loading && courses.length === 0 && <p>No courses available yet.</p>}
+      {loading && <p style={{ color: 'var(--color-text-muted)' }}>Loading courses...</p>}
+      {!loading && courses.length === 0 && (
+        <p style={{ color: 'var(--color-text-muted)' }}>No courses available yet.</p>
+      )}
 
-      <div style={{ display: 'grid', gap: 16 }}>
+      <div style={{ display: 'grid', gap: '1rem' }}>
         {courses.map(course => (
-          <Link key={course.id} href={`/learn/${course.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ border: '1px solid #ccc', borderRadius: 8, padding: 16 }}>
-              <h3 style={{ margin: '0 0 8px 0' }}>{course.title}</h3>
-              {course.category && <p style={{ margin: '0 0 8px 0', color: '#666', fontSize: 14 }}>{course.category}</p>}
-              <p style={{ margin: 0 }}>{course.description}</p>
+          <Link
+            key={course.id}
+            href={`/learn/${course.id}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <div style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius)',
+              padding: '1.25rem',
+              transition: 'border-color 0.15s ease',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem' }}>
+                <h3 style={{ margin: '0 0 0.4rem 0', color: 'var(--color-text)' }}>{course.title}</h3>
+                {course.category && (
+                  <span style={{
+                    background: 'var(--color-accent)',
+                    color: '#fff',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '999px',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {course.category}
+                  </span>
+                )}
+              </div>
+              <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
+                {course.description}
+              </p>
             </div>
           </Link>
         ))}
       </div>
     </div>
   );
-                }
+}
