@@ -56,7 +56,22 @@ export async function GET() {
       OR: [{ buyerId: session.user.id }, { sellerId: session.user.id }],
     },
     orderBy: { createdAt: 'desc' },
+    include: {
+      listing: { select: { title: true } },
+      buyer: { select: { id: true, name: true, email: true } },
+      seller: { select: { id: true, name: true, email: true } },
+    },
   });
 
-  return NextResponse.json(conversations);
+  const shaped = conversations.map((c) => {
+    const otherPerson = c.buyerId === session.user.id ? c.seller : c.buyer;
+    return {
+      id: c.id,
+      createdAt: c.createdAt,
+      listingTitle: c.listing?.title || 'Listing',
+      otherPersonName: otherPerson?.name || otherPerson?.email || 'Unknown',
+    };
+  });
+
+  return NextResponse.json(shaped);
 }
