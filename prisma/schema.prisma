@@ -73,17 +73,20 @@ model SkillListing {
 }
 
 model Conversation {
-  id          String       @id @default(cuid())
-  listingId   String
-  buyerId     String
-  sellerId    String
-  createdAt   DateTime     @default(now())
-  messages    Message[]
-  listing     SkillListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  buyer       User         @relation("ConversationBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
-  seller      User         @relation("ConversationSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  id            String        @id @default(cuid())
+  listingId     String?
+  rentListingId String?
+  buyerId       String
+  sellerId      String
+  createdAt     DateTime      @default(now())
+  messages      Message[]
+  listing       SkillListing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  rentListing   RentListing?  @relation(fields: [rentListingId], references: [id], onDelete: Cascade)
+  buyer         User          @relation("ConversationBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller        User          @relation("ConversationSeller", fields: [sellerId], references: [id], onDelete: Cascade)
 
   @@unique([listingId, buyerId])
+  @@unique([rentListingId, buyerId])
 }
 
 model Message {
@@ -96,16 +99,17 @@ model Message {
 }
 
 model RentListing {
-  id          String   @id @default(cuid())
-  userId      String
-  title       String
-  description String
-  type        String
-  price       Float
-  location    String
-  photoUrls   String
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String         @id @default(cuid())
+  userId        String
+  title         String
+  description   String
+  type          String
+  price         Float
+  location      String
+  photoUrls     String
+  createdAt     DateTime       @default(now())
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversations Conversation[]
 }
 
 model Course {
