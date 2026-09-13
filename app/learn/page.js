@@ -19,9 +19,22 @@ export default function LearnPage() {
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '2rem 1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1 style={{ margin: 0, color: 'var(--color-primary)' }}>Learn</h1>
-        <Link href="/learn/submit">
-          <button style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem' }}>+ Submit a Course</button>
-        </Link>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Link href="/learn/my-courses">
+            <button style={{
+              background: 'var(--color-surface)',
+              color: 'var(--color-primary)',
+              border: '1px solid var(--color-primary)',
+              padding: '0.6rem 1.2rem',
+              fontSize: '0.95rem',
+            }}>
+              My Courses
+            </button>
+          </Link>
+          <Link href="/learn/submit">
+            <button style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem' }}>+ Submit a Course</button>
+          </Link>
+        </div>
       </div>
 
       {loading && <p style={{ color: 'var(--color-text-muted)' }}>Loading courses...</p>}
@@ -68,4 +81,4 @@ export default function LearnPage() {
       </div>
     </div>
   );
-}
+        }
