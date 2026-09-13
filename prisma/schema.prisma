@@ -17,6 +17,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   skillListings SkillListing[]
+  rentListings  RentListing[]
   createdAt     DateTime  @default(now())
 }
 
@@ -107,6 +108,7 @@ model RentListing {
   location    String
   photoUrls   String
   createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Course {
