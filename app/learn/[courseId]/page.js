@@ -65,18 +65,43 @@ export default function CoursePage() {
     setEnrollment(data);
   }
 
-  if (loading) return <p style={{ padding: 24 }}>Loading...</p>;
-  if (!course) return <p style={{ padding: 24 }}>Course not found.</p>;
+  if (loading) return <p style={{ padding: '2rem', color: 'var(--color-text-muted)' }}>Loading...</p>;
+  if (!course) return <p style={{ padding: '2rem', color: 'var(--color-text-muted)' }}>Course not found.</p>;
+
+  const cardStyle = {
+    background: 'var(--color-surface)',
+    border: '1px solid var(--color-border)',
+    borderRadius: 'var(--radius)',
+    padding: '1.5rem',
+  };
 
   return (
-    <div style={{ maxWidth: 700, margin: '40px auto', padding: '0 16px' }}>
-      <h1>{course.title}</h1>
-      <p>{course.description}</p>
+    <div style={{ maxWidth: 700, margin: '0 auto', padding: '2rem 1rem' }}>
+      <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.3rem' }}>{course.title}</h1>
+      {course.category && (
+        <span style={{
+          display: 'inline-block',
+          background: 'var(--color-accent)',
+          color: '#fff',
+          fontSize: '0.75rem',
+          fontWeight: 600,
+          padding: '0.2rem 0.6rem',
+          borderRadius: '999px',
+          marginBottom: '0.75rem',
+        }}>
+          {course.category}
+        </span>
+      )}
+      <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>{course.description}</p>
 
-      {!session && <p>Please log in to enroll and take this course.</p>}
+      {!session && (
+        <div style={cardStyle}>
+          <p style={{ margin: 0 }}>Please log in to enroll and take this course.</p>
+        </div>
+      )}
 
       {session && !enrollment && (
-        <button onClick={handleEnroll} style={{ padding: '10px 20px' }}>Enroll</button>
+        <button onClick={handleEnroll} style={{ padding: '0.75rem 1.5rem' }}>Enroll</button>
       )}
 
       {session && enrollment && (
@@ -84,53 +109,66 @@ export default function CoursePage() {
           <video
             src={course.videoUrl}
             controls
-            style={{ width: '100%', marginBottom: 16, backgroundColor: '#000' }}
+            style={{ width: '100%', borderRadius: 'var(--radius)', marginBottom: '1rem', backgroundColor: '#000' }}
           />
 
           {!enrollment.videoWatched && (
-            <button onClick={handleMarkWatched} style={{ padding: '10px 20px', marginBottom: 24 }}>
+            <button onClick={handleMarkWatched} style={{ padding: '0.75rem 1.5rem', marginBottom: '2rem' }}>
               Mark Video as Watched
             </button>
           )}
 
           {enrollment.videoWatched && !enrollment.completedAt && (
-            <div>
-              <h2>Test</h2>
+            <div style={cardStyle}>
+              <h2 style={{ color: 'var(--color-primary)', marginTop: 0 }}>Test</h2>
               {course.questions.map((q, i) => {
                 const options = JSON.parse(q.options);
                 return (
-                  <div key={q.id} style={{ marginBottom: 16 }}>
-                    <p><strong>{i + 1}. {q.text}</strong></p>
+                  <div key={q.id} style={{ marginBottom: '1.25rem' }}>
+                    <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{i + 1}. {q.text}</p>
                     {options.map((opt, oi) => (
-                      <label key={oi} style={{ display: 'block', marginBottom: 4 }}>
+                      <label key={oi} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', cursor: 'pointer' }}>
                         <input
                           type="radio"
                           name={`q-${i}`}
                           checked={answers[i] === oi}
                           onChange={() => setAnswers({ ...answers, [i]: oi })}
-                        /> {opt}
+                          style={{ accentColor: 'var(--color-primary)' }}
+                        />
+                        {opt}
                       </label>
                     ))}
                   </div>
                 );
               })}
-              {error && <p style={{ color: 'red' }}>{error}</p>}
+              {error && <p style={{ color: '#B3261E', fontSize: '0.9rem' }}>{error}</p>}
               {enrollment.testScore != null && enrollment.testScore < 70 && (
-                <p style={{ color: 'red' }}>You scored {enrollment.testScore}%. You need 70% to pass — try again.</p>
+                <p style={{ color: '#B3261E', fontSize: '0.9rem' }}>
+                  You scored {enrollment.testScore}%. You need 70% to pass — try again.
+                </p>
               )}
-              <button onClick={handleSubmitTest} style={{ padding: '10px 20px' }}>Submit Test</button>
+              <button onClick={handleSubmitTest} style={{ padding: '0.75rem 1.5rem' }}>Submit Test</button>
             </div>
           )}
 
           {enrollment.completedAt && (
-            <div style={{ border: '2px solid green', padding: 20, textAlign: 'center' }}>
-              <h2>🎉 Course Completed!</h2>
-              <p>You scored {enrollment.testScore}%.</p>
-              <a href={`/learn/${courseId}/certificate`}>View Certificate</a>
+            <div style={{
+              ...cardStyle,
+              borderColor: 'var(--color-primary)',
+              textAlign: 'center',
+            }}>
+              <h2 style={{ color: 'var(--color-primary)', marginTop: 0 }}>🎉 Course Completed!</h2>
+              <p style={{ color: 'var(--color-text-muted)' }}>You scored {enrollment.testScore}%.</p>
+              <a
+                href={`/learn/${courseId}/certificate`}
+                style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}
+              >
+                View Certificate →
+              </a>
             </div>
           )}
         </>
       )}
     </div>
   );
-        }
+}
