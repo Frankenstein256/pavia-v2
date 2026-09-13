@@ -27,12 +27,15 @@ export default function Navbar() {
       <Link href="/messages" style={{ textDecoration: 'none', color: '#1A1A1A' }}>
         Messages
       </Link>
-          <Link href="/save" style={{ textDecoration: 'none', color: '#1A1A1A' }}>
-  Save
-</Link>
-    <Link href="/rent" style={{ textDecoration: 'none', color: '#1A1A1A' }}>
-  Rent
-</Link>
+      <Link href="/save" style={{ textDecoration: 'none', color: '#1A1A1A' }}>
+        Save
+      </Link>
+      <Link href="/rent" style={{ textDecoration: 'none', color: '#1A1A1A' }}>
+        Rent
+      </Link>
+      <Link href="/learn" style={{ textDecoration: 'none', color: '#1A1A1A' }}>
+        Learn
+      </Link>
     </nav>
   );
   }
