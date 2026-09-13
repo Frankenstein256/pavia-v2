@@ -6,6 +6,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 export async function GET() {
   const listings = await prisma.rentListing.findMany({
     orderBy: { createdAt: 'desc' },
+    include: { user: { select: { name: true } } },
   });
   return NextResponse.json(listings);
 }
@@ -35,4 +36,4 @@ export async function POST(req) {
   });
 
   return NextResponse.json(listing);
-      }
+}
