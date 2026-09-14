@@ -1,10 +1,11 @@
 import { Providers } from './providers';
 import './globals.css';
-import Navbar from './Navbar';
+import AppHeader from './AppHeader';
+import BottomNav from './BottomNav';
 
 export const metadata = {
-  title: 'Pavia v2',
-  description: 'Pavia rebuild on Next.js',
+  title: 'Pavia',
+  description: 'Work, rent, and learn — all in one place.',
 };
 
 export default function RootLayout({ children }) {
@@ -12,10 +13,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Providers>
-  <Navbar />
-  {children}
-</Providers>
+          <AppHeader />
+          {children}
+          <BottomNav />
+        </Providers>
       </body>
     </html>
   );
-}
+    }
