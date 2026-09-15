@@ -4,6 +4,14 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import MessageButton from './MessageButton';
 
+function Stars({ rating, count }) {
+  return (
+    <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+      <span style={{ color: 'var(--color-gold)' }}>★</span> {rating.toFixed(1)} ({count})
+    </span>
+  );
+}
+
 export default function WorkList({ listings }) {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
@@ -84,6 +92,9 @@ export default function WorkList({ listings }) {
                   <span style={{ fontSize: 13, color: 'var(--color-text)', fontWeight: 600 }}>
                     {listing.user.name || 'Anonymous'}
                   </span>
+                  {listing.userRating && (
+                    <Stars rating={listing.userRating.avgRating} count={listing.userRating.reviewCount} />
+                  )}
                 </div>
               </Link>
             )}
@@ -94,4 +105,4 @@ export default function WorkList({ listings }) {
       </div>
     </>
   );
-          }
+      }
