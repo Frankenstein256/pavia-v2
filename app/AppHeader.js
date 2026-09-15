@@ -1,5 +1,5 @@
 'use client';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
 export default function AppHeader() {
@@ -21,18 +21,25 @@ export default function AppHeader() {
       <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
         <img src="/logo.png" alt="Pavia" style={{ height: 34, width: 'auto' }} />
       </Link>
-      <button
-        onClick={() => signOut({ callbackUrl: '/' })}
-        style={{
-          background: 'transparent',
-          color: 'var(--color-text-muted)',
-          fontSize: 13,
-          fontWeight: 600,
-          padding: '6px 10px',
-        }}
-      >
-        Log out
-      </button>
+
+      <Link href="/profile" style={{ textDecoration: 'none' }}>
+        {session.user.image ? (
+          <img
+            src={session.user.image}
+            alt="Profile"
+            style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }}
+          />
+        ) : (
+          <div style={{
+            width: 34, height: 34, borderRadius: '50%',
+            background: 'var(--color-primary)', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 14, fontWeight: 700,
+          }}>
+            {(session.user.name || session.user.email || '?')[0].toUpperCase()}
+          </div>
+        )}
+      </Link>
     </header>
   );
-    }
+        }
