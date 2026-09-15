@@ -68,6 +68,7 @@ export default function Home() {
           placeholder="Search skills..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          style={{ flex: 1, minWidth: 0 }}
         />
         <button type="submit" style={{ flexShrink: 0 }}>Search</button>
       </form>
