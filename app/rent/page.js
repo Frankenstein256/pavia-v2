@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import RentMessageButton from './RentMessageButton';
 
 export default function RentPage() {
   const [listings, setListings] = useState([]);
@@ -86,69 +88,94 @@ export default function RentPage() {
     loadListings();
   }
 
-  if (loading) return <main style={{ padding: '2rem' }}>Loading...</main>;
+  if (loading) return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></main>;
 
   return (
-    <main style={{ maxWidth: 700, margin: '2rem auto', padding: '1rem', fontFamily: 'sans-serif' }}>
+    <main className="page-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Find a place</h1>
-        <button onClick={() => setShowForm(!showForm)} style={{ padding: '0.6rem 1rem', cursor: 'pointer' }}>
+        <h1 style={{ color: 'var(--color-primary)' }}>Find a place</h1>
+        <button onClick={() => setShowForm(!showForm)} style={{ fontSize: 14, padding: '8px 14px' }}>
           {showForm ? 'Cancel' : '+ List a place'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem', border: '1px solid #ddd', borderRadius: '10px', padding: '1rem' }}>
-          <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required style={{ padding: '0.6rem' }} />
-          <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} style={{ padding: '0.6rem' }} />
-          <select value={type} onChange={(e) => setType(e.target.value)} style={{ padding: '0.6rem' }}>
+        <form onSubmit={handleCreate} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
+          <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} />
+          <select value={type} onChange={(e) => setType(e.target.value)}>
             <option value="room">Room (shared)</option>
             <option value="apartment">Whole apartment/house</option>
           </select>
-          <input type="number" placeholder="Price per month (GHS)" value={price} onChange={(e) => setPrice(e.target.value)} required style={{ padding: '0.6rem' }} />
-          <input type="text" placeholder="Location (e.g. East Legon)" value={location} onChange={(e) => setLocation(e.target.value)} required style={{ padding: '0.6rem' }} />
+          <input type="number" placeholder="Price per month (GHS)" value={price} onChange={(e) => setPrice(e.target.value)} required />
+          <input type="text" placeholder="Location (e.g. East Legon)" value={location} onChange={(e) => setLocation(e.target.value)} required />
 
-          <label style={{ fontSize: '0.9rem', color: '#666' }}>Photos</label>
-          <input type="file" accept="image/*" multiple onChange={handlePhotoChange} style={{ padding: '0.4rem' }} />
-          {uploading && <p style={{ color: '#666' }}>Uploading...</p>}
+          <label style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Photos</label>
+          <input type="file" accept="image/*" multiple onChange={handlePhotoChange} />
+          {uploading && <p style={{ color: 'var(--color-text-muted)' }}>Uploading...</p>}
           {photoUrls && (
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {photoUrls.split(',').map((url, i) => (
-                <img key={i} src={url} alt="preview" style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '6px' }} />
+                <img key={i} src={url} alt="preview" style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px' }} />
               ))}
             </div>
           )}
 
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          <button type="submit" disabled={creating || uploading} style={{ padding: '0.7rem', cursor: 'pointer' }}>
+          {error && <p style={{ color: 'var(--color-danger)' }}>{error}</p>}
+          <button type="submit" disabled={creating || uploading}>
             {creating ? 'Posting...' : 'Post listing'}
           </button>
         </form>
       )}
 
-      <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {listings.length === 0 && <p>No listings yet.</p>}
+      <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {listings.length === 0 && (
+          <div className="card" style={{ textAlign: 'center' }}>
+            <h3 style={{ marginBottom: 4 }}>No listings yet</h3>
+            <p style={{ color: 'var(--color-text-muted)' }}>Be the first to list a place.</p>
+          </div>
+        )}
 
         {listings.map((listing) => {
           const photos = listing.photoUrls ? listing.photoUrls.split(',').map((p) => p.trim()) : [];
           return (
-            <div key={listing.id} style={{ border: '1px solid #ddd', borderRadius: '10px', padding: '1rem' }}>
+            <div key={listing.id} className="card">
               {photos[0] && (
-                <img src={photos[0]} alt={listing.title} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '0.5rem' }} />
+                <img src={photos[0]} alt={listing.title} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '0.6rem' }} />
               )}
-              <h3 style={{ margin: 0 }}>{listing.title}</h3>
-              <p style={{ color: '#666', margin: '0.3rem 0' }}>
+              <h3 style={{ color: 'var(--color-text)', margin: 0 }}>{listing.title}</h3>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: 13, margin: '0.3rem 0' }}>
                 {listing.type === 'room' ? 'Room' : 'Whole place'} · {listing.location}
               </p>
-              <p style={{ margin: '0.5rem 0' }}>{listing.description}</p>
-              <p style={{ fontWeight: 'bold', margin: 0 }}>GHS {listing.price}/month</p>
-              <p style={{ fontSize: '0.85rem', color: '#999', marginTop: '0.5rem' }}>
-                Posted by {listing.user?.name || 'Anonymous'}
-              </p>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: 14, margin: '0.5rem 0' }}>{listing.description}</p>
+              <p style={{ fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}>GHS {listing.price}/month</p>
+
+              {listing.user?.id && (
+                <Link href={`/profile/${listing.user.id}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, marginBottom: 8 }}>
+                    {listing.user.image ? (
+                      <img src={listing.user.image} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: 'var(--color-primary)', color: '#fff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700,
+                      }}>
+                        {(listing.user.name || '?')[0].toUpperCase()}
+                      </div>
+                    )}
+                    <span style={{ fontSize: 13, color: 'var(--color-text)', fontWeight: 600 }}>
+                      {listing.user.name || 'Anonymous'}
+                    </span>
+                  </div>
+                </Link>
+              )}
+
+              <RentMessageButton rentListingId={listing.id} />
             </div>
           );
         })}
       </div>
     </main>
   );
-  }
+}
