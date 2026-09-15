@@ -6,7 +6,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 export async function GET() {
   const listings = await prisma.rentListing.findMany({
     orderBy: { createdAt: 'desc' },
-    include: { user: { select: { name: true } } },
+    include: { user: { select: { id: true, name: true, image: true } } },
   });
   return NextResponse.json(listings);
 }
