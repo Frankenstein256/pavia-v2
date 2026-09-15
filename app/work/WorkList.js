@@ -1,6 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import MessageButton from './MessageButton';
 
 export default function WorkList({ listings }) {
@@ -65,13 +66,32 @@ export default function WorkList({ listings }) {
               <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>📍 {listing.location}</p>
             )}
             <p style={{ color: 'var(--color-text-muted)', fontSize: 14, marginBottom: 8 }}>{listing.description}</p>
-            <p style={{ fontSize: 13, color: 'var(--color-text-muted)', marginBottom: 4 }}>
-              by {listing.user?.name || 'Anonymous'}
-            </p>
+
+            {listing.user?.id && (
+              <Link href={`/profile/${listing.user.id}`} style={{ textDecoration: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                  {listing.user.image ? (
+                    <img src={listing.user.image} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{
+                      width: 22, height: 22, borderRadius: '50%',
+                      background: 'var(--color-primary)', color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700,
+                    }}>
+                      {(listing.user.name || '?')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <span style={{ fontSize: 13, color: 'var(--color-text)', fontWeight: 600 }}>
+                    {listing.user.name || 'Anonymous'}
+                  </span>
+                </div>
+              </Link>
+            )}
+
             <MessageButton listingId={listing.id} />
           </div>
         ))}
       </div>
     </>
   );
-}
+          }
