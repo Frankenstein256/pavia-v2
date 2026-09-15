@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export default async function WorkPage() {
   const listings = await prisma.skillListing.findMany({
     orderBy: { createdAt: 'desc' },
-    include: { user: { select: { name: true } } },
+    include: { user: { select: { id: true, name: true, image: true } } },
   });
 
   return (
@@ -24,4 +24,4 @@ export default async function WorkPage() {
       <WorkList listings={listings} />
     </main>
   );
-  }
+}
