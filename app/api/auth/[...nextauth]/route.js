@@ -34,8 +34,28 @@ export const authOptions = {
     signIn: '/login',
   },
   callbacks: {
+    async jwt({ token, user, trigger }) {
+      if (user) {
+        token.image = user.image;
+        token.name = user.name;
+      }
+
+      if (trigger === 'update') {
+        const freshUser = await prisma.user.findUnique({ where: { id: token.sub } });
+        if (freshUser) {
+          token.image = freshUser.image;
+          token.name = freshUser.name;
+        }
+      }
+
+      return token;
+    },
     async session({ session, token }) {
-      if (session?.user) session.user.id = token.sub;
+      if (session?.user) {
+        session.user.id = token.sub;
+        session.user.image = token.image;
+        session.user.name = token.name;
+      }
       return session;
     },
   },
