@@ -140,15 +140,17 @@ export default function RentPage() {
           const photos = listing.photoUrls ? listing.photoUrls.split(',').map((p) => p.trim()) : [];
           return (
             <div key={listing.id} className="card">
-              {photos[0] && (
-                <img src={photos[0]} alt={listing.title} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '0.6rem' }} />
-              )}
-              <h3 style={{ color: 'var(--color-text)', margin: 0 }}>{listing.title}</h3>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: 13, margin: '0.3rem 0' }}>
-                {listing.type === 'room' ? 'Room' : 'Whole place'} · {listing.location}
-              </p>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: 14, margin: '0.5rem 0' }}>{listing.description}</p>
-              <p style={{ fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}>GHS {listing.price}/month</p>
+              <Link href={`/rent/${listing.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                {photos[0] && (
+                  <img src={photos[0]} alt={listing.title} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '0.6rem' }} />
+                )}
+                <h3 style={{ color: 'var(--color-text)', margin: 0 }}>{listing.title}</h3>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: 13, margin: '0.3rem 0' }}>
+                  {listing.type === 'room' ? 'Room' : 'Whole place'} · {listing.location}
+                </p>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: 14, margin: '0.5rem 0' }}>{listing.description}</p>
+                <p style={{ fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}>GHS {listing.price}/month</p>
+              </Link>
 
               {listing.user?.id && (
                 <Link href={`/profile/${listing.user.id}`} style={{ textDecoration: 'none' }}>
@@ -178,4 +180,4 @@ export default function RentPage() {
       </div>
     </main>
   );
-}
+    }
