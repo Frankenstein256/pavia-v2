@@ -65,43 +65,27 @@ export default function CoursePage() {
     setEnrollment(data);
   }
 
-  if (loading) return <p style={{ padding: '2rem', color: 'var(--color-text-muted)' }}>Loading...</p>;
-  if (!course) return <p style={{ padding: '2rem', color: 'var(--color-text-muted)' }}>Course not found.</p>;
-
-  const cardStyle = {
-    background: 'var(--color-surface)',
-    border: '1px solid var(--color-border)',
-    borderRadius: 'var(--radius)',
-    padding: '1.5rem',
-  };
+  if (loading) return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></main>;
+  if (!course) return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Course not found.</p></main>;
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto', padding: '2rem 1rem' }}>
-      <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.3rem' }}>{course.title}</h1>
+    <main className="page-container">
+      <h1 style={{ color: 'var(--color-primary)', marginBottom: 6 }}>{course.title}</h1>
       {course.category && (
-        <span style={{
-          display: 'inline-block',
-          background: 'var(--color-accent)',
-          color: '#fff',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          padding: '0.2rem 0.6rem',
-          borderRadius: '999px',
-          marginBottom: '0.75rem',
-        }}>
+        <span className="badge badge-gold" style={{ marginBottom: 12, display: 'inline-block' }}>
           {course.category}
         </span>
       )}
-      <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>{course.description}</p>
+      <p style={{ color: 'var(--color-text-muted)', marginBottom: 24 }}>{course.description}</p>
 
       {!session && (
-        <div style={cardStyle}>
+        <div className="card">
           <p style={{ margin: 0 }}>Please log in to enroll and take this course.</p>
         </div>
       )}
 
       {session && !enrollment && (
-        <button onClick={handleEnroll} style={{ padding: '0.75rem 1.5rem' }}>Enroll</button>
+        <button onClick={handleEnroll}>Enroll</button>
       )}
 
       {session && enrollment && (
@@ -109,31 +93,31 @@ export default function CoursePage() {
           <video
             src={course.videoUrl}
             controls
-            style={{ width: '100%', borderRadius: 'var(--radius)', marginBottom: '1rem', backgroundColor: '#000' }}
+            style={{ width: '100%', borderRadius: 'var(--radius)', marginBottom: 16, backgroundColor: '#000' }}
           />
 
           {!enrollment.videoWatched && (
-            <button onClick={handleMarkWatched} style={{ padding: '0.75rem 1.5rem', marginBottom: '2rem' }}>
+            <button onClick={handleMarkWatched} style={{ marginBottom: 32 }}>
               Mark Video as Watched
             </button>
           )}
 
           {enrollment.videoWatched && !enrollment.completedAt && (
-            <div style={cardStyle}>
-              <h2 style={{ color: 'var(--color-primary)', marginTop: 0 }}>Test</h2>
+            <div className="card">
+              <h2 style={{ color: 'var(--color-primary)', marginBottom: 14 }}>Test</h2>
               {course.questions.map((q, i) => {
                 const options = JSON.parse(q.options);
                 return (
-                  <div key={q.id} style={{ marginBottom: '1.25rem' }}>
-                    <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{i + 1}. {q.text}</p>
+                  <div key={q.id} style={{ marginBottom: 20 }}>
+                    <p style={{ fontWeight: 600, marginBottom: 8 }}>{i + 1}. {q.text}</p>
                     {options.map((opt, oi) => (
-                      <label key={oi} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', cursor: 'pointer' }}>
+                      <label key={oi} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, cursor: 'pointer' }}>
                         <input
                           type="radio"
                           name={`q-${i}`}
                           checked={answers[i] === oi}
                           onChange={() => setAnswers({ ...answers, [i]: oi })}
-                          style={{ accentColor: 'var(--color-primary)' }}
+                          style={{ accentColor: 'var(--color-primary)', width: 'auto' }}
                         />
                         {opt}
                       </label>
@@ -141,27 +125,23 @@ export default function CoursePage() {
                   </div>
                 );
               })}
-              {error && <p style={{ color: '#B3261E', fontSize: '0.9rem' }}>{error}</p>}
+              {error && <p style={{ color: 'var(--color-danger)', fontSize: 14 }}>{error}</p>}
               {enrollment.testScore != null && enrollment.testScore < 70 && (
-                <p style={{ color: '#B3261E', fontSize: '0.9rem' }}>
+                <p style={{ color: 'var(--color-danger)', fontSize: 14 }}>
                   You scored {enrollment.testScore}%. You need 70% to pass — try again.
                 </p>
               )}
-              <button onClick={handleSubmitTest} style={{ padding: '0.75rem 1.5rem' }}>Submit Test</button>
+              <button onClick={handleSubmitTest}>Submit Test</button>
             </div>
           )}
 
           {enrollment.completedAt && (
-            <div style={{
-              ...cardStyle,
-              borderColor: 'var(--color-primary)',
-              textAlign: 'center',
-            }}>
-              <h2 style={{ color: 'var(--color-primary)', marginTop: 0 }}>🎉 Course Completed!</h2>
-              <p style={{ color: 'var(--color-text-muted)' }}>You scored {enrollment.testScore}%.</p>
+            <div className="card" style={{ borderColor: 'var(--color-primary)', textAlign: 'center' }}>
+              <h2 style={{ color: 'var(--color-primary)', marginBottom: 8 }}>🎉 Course Completed!</h2>
+              <p style={{ color: 'var(--color-text-muted)', marginBottom: 12 }}>You scored {enrollment.testScore}%.</p>
               <a
                 href={`/learn/${courseId}/certificate`}
-                style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}
+                style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}
               >
                 View Certificate →
               </a>
@@ -169,6 +149,6 @@ export default function CoursePage() {
           )}
         </>
       )}
-    </div>
+    </main>
   );
-}
+    }
