@@ -9,35 +9,41 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
-  const { listingId } = await req.json();
-  if (!listingId) {
-    return NextResponse.json({ error: 'Missing listingId' }, { status: 400 });
+  const { listingId, rentListingId } = await req.json();
+
+  if (!listingId && !rentListingId) {
+    return NextResponse.json({ error: 'Missing listingId or rentListingId' }, { status: 400 });
   }
 
-  const listing = await prisma.skillListing.findUnique({ where: { id: listingId } });
-  if (!listing) {
-    return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+  let sellerId;
+
+  if (listingId) {
+    const listing = await prisma.skillListing.findUnique({ where: { id: listingId } });
+    if (!listing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+    sellerId = listing.userId;
+  } else {
+    const listing = await prisma.rentListing.findUnique({ where: { id: rentListingId } });
+    if (!listing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
+    sellerId = listing.userId;
   }
 
-  if (listing.userId === session.user.id) {
+  if (sellerId === session.user.id) {
     return NextResponse.json({ error: "Can't message your own listing" }, { status: 400 });
   }
 
-  let conversation = await prisma.conversation.findUnique({
-    where: {
-      listingId_buyerId: {
-        listingId,
-        buyerId: session.user.id,
-      },
-    },
-  });
+  const where = listingId
+    ? { listingId_buyerId: { listingId, buyerId: session.user.id } }
+    : { rentListingId_buyerId: { rentListingId, buyerId: session.user.id } };
+
+  let conversation = await prisma.conversation.findUnique({ where });
 
   if (!conversation) {
     conversation = await prisma.conversation.create({
       data: {
-        listingId,
+        listingId: listingId || null,
+        rentListingId: rentListingId || null,
         buyerId: session.user.id,
-        sellerId: listing.userId,
+        sellerId,
       },
     });
   }
@@ -58,6 +64,7 @@ export async function GET() {
     orderBy: { createdAt: 'desc' },
     include: {
       listing: { select: { title: true } },
+      rentListing: { select: { title: true } },
       buyer: { select: { id: true, name: true, email: true } },
       seller: { select: { id: true, name: true, email: true } },
     },
@@ -68,7 +75,7 @@ export async function GET() {
     return {
       id: c.id,
       createdAt: c.createdAt,
-      listingTitle: c.listing?.title || 'Listing',
+      listingTitle: c.listing?.title || c.rentListing?.title || 'Listing',
       otherPersonName: otherPerson?.name || otherPerson?.email || 'Unknown',
     };
   });
