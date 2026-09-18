@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const categories = ['Design', 'Photography', 'Writing', 'Tech', 'Repairs', 'Beauty', 'Catering', 'Tutoring', 'Other'];
+
 export default function NewListingPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
@@ -13,6 +15,9 @@ export default function NewListingPage() {
   const [location, setLocation] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const labelStyle = { display: 'block', marginBottom: 6, fontSize: 13, color: 'var(--color-text-muted)', fontWeight: 600 };
+  const fieldWrap = { marginBottom: 16 };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -37,64 +42,81 @@ export default function NewListingPage() {
   }
 
   return (
-    <main style={{ maxWidth: 500, margin: '2rem auto', padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h1>List your skill</h1>
+    <main className="page-container" style={{ maxWidth: 500 }}>
+      <h1 style={{ color: 'var(--color-primary)', marginBottom: 6 }}>List your skill</h1>
+      <p style={{ color: 'var(--color-text-muted)', marginBottom: 20 }}>
+        Let people know what you can help with.
+      </p>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
-        <input
-          type="text"
-          placeholder="Title (e.g. Graphic Design, Hair Braiding)"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          style={{ padding: '0.6rem' }}
-        />
-        <textarea
-          placeholder="Describe what you offer"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-          rows={4}
-          style={{ padding: '0.6rem' }}
-        />
-        <input
-          type="text"
-          placeholder="Category (e.g. Design, Tech, Beauty)"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          required
-          style={{ padding: '0.6rem' }}
-        />
-        <select
-          value={priceType}
-          onChange={(e) => setPriceType(e.target.value)}
-          style={{ padding: '0.6rem' }}
-        >
-          <option value="fixed">Fixed price</option>
-          <option value="hourly">Hourly rate</option>
-          <option value="negotiable">Negotiable</option>
-        </select>
-        <input
-          type="number"
-          placeholder="Price (GHS) — optional"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          style={{ padding: '0.6rem' }}
-        />
-        <input
-          type="text"
-          placeholder="Location (e.g. Accra)"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          style={{ padding: '0.6rem' }}
-        />
+      <form onSubmit={handleSubmit} className="card">
+        <div style={fieldWrap}>
+          <label style={labelStyle}>Title</label>
+          <input
+            type="text"
+            placeholder="e.g. Graphic Design, Hair Braiding"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div style={fieldWrap}>
+          <label style={labelStyle}>Description</label>
+          <textarea
+            placeholder="Describe what you offer"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            rows={4}
+          />
+        </div>
 
-        <button type="submit" disabled={loading} style={{ padding: '0.7rem', cursor: 'pointer' }}>
-          {loading ? 'Posting...' : 'Post listing'}
+        <div style={fieldWrap}>
+          <label style={labelStyle}>Category</label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+            <option value="" disabled>Select a category</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+          <div style={{ flex: 1 }}>
+            <label style={labelStyle}>Pricing</label>
+            <select value={priceType} onChange={(e) => setPriceType(e.target.value)}>
+              <option value="fixed">Fixed price</option>
+              <option value="hourly">Hourly rate</option>
+              <option value="negotiable">Negotiable</option>
+            </select>
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={labelStyle}>Price (GHS)</label>
+            <input
+              type="number"
+              placeholder="Optional"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div style={fieldWrap}>
+          <label style={labelStyle}>Location</label>
+          <input
+            type="text"
+            placeholder="e.g. Accra"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          />
+        </div>
+
+        {error && <p style={{ color: 'var(--color-danger)', fontSize: 14, marginBottom: 12 }}>{error}</p>}
+
+        <button type="submit" disabled={loading} style={{ width: '100%' }}>
+          {loading ? 'Posting...' : 'Publish skill'}
         </button>
       </form>
     </main>
   );
-                            }
+              }
