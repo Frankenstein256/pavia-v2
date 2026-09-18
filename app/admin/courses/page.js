@@ -29,26 +29,35 @@ export default function AdminCoursesPage() {
     load();
   }
 
-  if (!session) return <p style={{ padding: 24 }}>Please log in.</p>;
-  if (loading) return <p style={{ padding: 24 }}>Loading...</p>;
+  if (!session) return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Please log in.</p></main>;
+  if (loading) return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></main>;
 
   return (
-    <div style={{ maxWidth: 700, margin: '40px auto', padding: 16 }}>
-      <h1>Pending Course Reviews</h1>
-      {courses.length === 0 && <p>No pending courses.</p>}
-      {courses.map(course => (
-        <div key={course.id} style={{ border: '1px solid #ccc', padding: 16, marginBottom: 16 }}>
-          <h3>{course.title}</h3>
-          <p>{course.description}</p>
-          <p><strong>Video:</strong> {course.videoUrl}</p>
-          <p><strong>Questions:</strong> {course.questions.length}</p>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => handleDecision(course.id, 'approved')} style={{ padding: '8px 16px' }}>Approve</button>
-            <button onClick={() => handleDecision(course.id, 'rejected')} style={{ padding: '8px 16px' }}>Reject</button>
-            <a href={course.videoUrl} target="_blank" rel="noopener noreferrer">Preview Video</a>
-          </div>
+    <main className="page-container">
+      <h1 style={{ color: 'var(--color-primary)', marginBottom: 16 }}>Pending Course Reviews</h1>
+
+      {courses.length === 0 && (
+        <div className="card" style={{ textAlign: 'center' }}>
+          <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>No pending courses.</p>
         </div>
-      ))}
-    </div>
+      )}
+
+      <div style={{ display: 'grid', gap: 12 }}>
+        {courses.map(course => (
+          <div key={course.id} className="card">
+            <h3 style={{ marginBottom: 6 }}>{course.title}</h3>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: 14, marginBottom: 8 }}>{course.description}</p>
+            <p style={{ fontSize: 13, marginBottom: 4 }}><strong>Questions:</strong> {course.questions.length}</p>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+              <button onClick={() => handleDecision(course.id, 'approved')} style={{ fontSize: 14 }}>Approve</button>
+              <button onClick={() => handleDecision(course.id, 'rejected')} className="btn-secondary" style={{ fontSize: 14 }}>Reject</button>
+              <a href={course.videoUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: 14 }}>
+                Preview Video →
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </main>
   );
-        }
+}
