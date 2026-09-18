@@ -28,14 +28,14 @@ export default function CertificatePage() {
   }, [session, courseId]);
 
   if (loading || !course) {
-    return <p style={{ padding: '2rem', color: 'var(--color-text-muted)' }}>Loading...</p>;
+    return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></main>;
   }
   if (!enrollment?.completedAt) {
-    return <p style={{ padding: '2rem', color: 'var(--color-text-muted)' }}>You haven't completed this course yet.</p>;
+    return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>You haven't completed this course yet.</p></main>;
   }
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto', padding: '2.5rem 1rem' }}>
+    <main className="page-container">
       <div style={{
         background: 'var(--color-surface)',
         border: '3px solid var(--color-primary)',
@@ -47,13 +47,13 @@ export default function CertificatePage() {
         <div style={{
           position: 'absolute',
           top: 12, left: 12, right: 12, bottom: 12,
-          border: '1px solid var(--color-accent)',
+          border: '1px solid var(--color-gold)',
           borderRadius: '6px',
           pointerEvents: 'none',
         }} />
 
         <p style={{
-          color: 'var(--color-accent)',
+          color: 'var(--color-gold)',
           letterSpacing: '3px',
           fontSize: '0.85rem',
           fontWeight: 700,
@@ -62,7 +62,7 @@ export default function CertificatePage() {
           CERTIFICATE OF COMPLETION
         </p>
 
-        <div style={{ width: 60, height: 3, background: 'var(--color-accent)', margin: '0.75rem auto 2rem auto' }} />
+        <div style={{ width: 60, height: 3, background: 'var(--color-gold)', margin: '0.75rem auto 2rem auto' }} />
 
         <p style={{ color: 'var(--color-text-muted)', margin: '0 0 0.4rem 0' }}>This certifies that</p>
         <h1 style={{ color: 'var(--color-primary)', margin: '0 0 1.5rem 0', fontSize: '2rem' }}>
@@ -89,6 +89,6 @@ export default function CertificatePage() {
           PAVIA
         </p>
       </div>
-    </div>
+    </main>
   );
-            }
+    }
