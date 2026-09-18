@@ -4,6 +4,19 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import RentMessageButton from './RentMessageButton';
 
+function PhotoPlaceholder() {
+  return (
+    <div style={{
+      width: '100%', height: 180, borderRadius: 10, marginBottom: 10,
+      background: '#EAF3EE', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z" /><circle cx="12" cy="10" r="2.5" />
+      </svg>
+    </div>
+  );
+}
+
 export default function RentPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +30,9 @@ export default function RentPage() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
+
+  const labelStyle = { display: 'block', marginBottom: 6, fontSize: 13, color: 'var(--color-text-muted)', fontWeight: 600 };
+  const fieldWrap = { marginBottom: 16 };
 
   useEffect(() => {
     loadListings();
@@ -43,10 +59,7 @@ export default function RentPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
 
       if (res.ok) {
         const data = await res.json();
@@ -92,43 +105,70 @@ export default function RentPage() {
 
   return (
     <main className="page-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <h1 style={{ color: 'var(--color-primary)' }}>Find a place</h1>
         <button onClick={() => setShowForm(!showForm)} style={{ fontSize: 14, padding: '8px 14px' }}>
           {showForm ? 'Cancel' : '+ List a place'}
         </button>
       </div>
+      <p style={{ color: 'var(--color-text-muted)', marginBottom: 20 }}>
+        Browse rooms and apartments listed by real people.
+      </p>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
-          <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} />
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="room">Room (shared)</option>
-            <option value="apartment">Whole apartment/house</option>
-          </select>
-          <input type="number" placeholder="Price per month (GHS)" value={price} onChange={(e) => setPrice(e.target.value)} required />
-          <input type="text" placeholder="Location (e.g. East Legon)" value={location} onChange={(e) => setLocation(e.target.value)} required />
+        <form onSubmit={handleCreate} className="card" style={{ marginBottom: 24 }}>
+          <h3 style={{ marginBottom: 16 }}>List your place</h3>
 
-          <label style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Photos</label>
-          <input type="file" accept="image/*" multiple onChange={handlePhotoChange} />
-          {uploading && <p style={{ color: 'var(--color-text-muted)' }}>Uploading...</p>}
-          {photoUrls && (
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {photoUrls.split(',').map((url, i) => (
-                <img key={i} src={url} alt="preview" style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px' }} />
-              ))}
+          <div style={fieldWrap}>
+            <label style={labelStyle}>Title</label>
+            <input type="text" placeholder="e.g. Cozy single room near campus" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </div>
+
+          <div style={fieldWrap}>
+            <label style={labelStyle}>Description</label>
+            <textarea placeholder="Describe the place — size, features, nearby amenities..." value={description} onChange={(e) => setDescription(e.target.value)} required rows={3} />
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Type</label>
+              <select value={type} onChange={(e) => setType(e.target.value)}>
+                <option value="room">Room (shared)</option>
+                <option value="apartment">Whole apartment/house</option>
+              </select>
             </div>
-          )}
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Price/month (GHS)</label>
+              <input type="number" placeholder="e.g. 800" value={price} onChange={(e) => setPrice(e.target.value)} required />
+            </div>
+          </div>
 
-          {error && <p style={{ color: 'var(--color-danger)' }}>{error}</p>}
-          <button type="submit" disabled={creating || uploading}>
-            {creating ? 'Posting...' : 'Post listing'}
+          <div style={fieldWrap}>
+            <label style={labelStyle}>Location</label>
+            <input type="text" placeholder="e.g. East Legon" value={location} onChange={(e) => setLocation(e.target.value)} required />
+          </div>
+
+          <div style={fieldWrap}>
+            <label style={labelStyle}>Photos</label>
+            <input type="file" accept="image/*" multiple onChange={handlePhotoChange} />
+            {uploading && <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginTop: 6 }}>Uploading...</p>}
+            {photoUrls && (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+                {photoUrls.split(',').map((url, i) => (
+                  <img key={i} src={url} alt="preview" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {error && <p style={{ color: 'var(--color-danger)', fontSize: 14, marginBottom: 12 }}>{error}</p>}
+          <button type="submit" disabled={creating || uploading} style={{ width: '100%' }}>
+            {creating ? 'Posting...' : 'Publish listing'}
           </button>
         </form>
       )}
 
-      <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {listings.length === 0 && (
           <div className="card" style={{ textAlign: 'center' }}>
             <h3 style={{ marginBottom: 4 }}>No listings yet</h3>
@@ -141,15 +181,30 @@ export default function RentPage() {
           return (
             <div key={listing.id} className="card">
               <Link href={`/rent/${listing.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                {photos[0] && (
-                  <img src={photos[0]} alt={listing.title} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '0.6rem' }} />
+                {photos[0] ? (
+                  <div style={{ position: 'relative' }}>
+                    <img src={photos[0]} alt={listing.title} style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 10, marginBottom: 10 }} />
+                    {photos.length > 1 && (
+                      <span style={{
+                        position: 'absolute', bottom: 18, right: 8,
+                        background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 11, fontWeight: 600,
+                        padding: '2px 8px', borderRadius: 999,
+                      }}>
+                        +{photos.length - 1} more
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <PhotoPlaceholder />
                 )}
-                <h3 style={{ color: 'var(--color-text)', margin: 0 }}>{listing.title}</h3>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: 13, margin: '0.3rem 0' }}>
-                  {listing.type === 'room' ? 'Room' : 'Whole place'} · {listing.location}
-                </p>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: 14, margin: '0.5rem 0' }}>{listing.description}</p>
-                <p style={{ fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}>GHS {listing.price}/month</p>
+
+                <span className="badge badge-green" style={{ marginBottom: 6 }}>
+                  {listing.type === 'room' ? 'Room' : 'Whole place'}
+                </span>
+                <h3 style={{ color: 'var(--color-text)', margin: '4px 0 2px' }}>{listing.title}</h3>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>📍 {listing.location}</p>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: 14, marginBottom: 6 }}>{listing.description}</p>
+                <p style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: 17 }}>GHS {listing.price}<span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-muted)' }}>/month</span></p>
               </Link>
 
               {listing.user?.id && (
@@ -180,4 +235,4 @@ export default function RentPage() {
       </div>
     </main>
   );
-    }
+  }
