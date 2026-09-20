@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import RentMessageButton from './RentMessageButton';
+import SaveButton from '../SaveButton';
 
 function PhotoPlaceholder() {
   return (
@@ -34,6 +35,7 @@ export default function RentPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [activeType, setActiveType] = useState('All');
+  const [savedIds, setSavedIds] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('room');
@@ -49,6 +51,9 @@ export default function RentPage() {
 
   useEffect(() => {
     loadListings();
+    fetch('/api/saved/check')
+      .then((res) => res.json())
+      .then((data) => setSavedIds(data.rentListingIds || []));
   }, []);
 
   async function loadListings() {
@@ -226,22 +231,27 @@ export default function RentPage() {
           return (
             <div key={listing.id} className="card">
               <Link href={`/rent/${listing.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                {photos[0] ? (
-                  <div style={{ position: 'relative' }}>
-                    <img src={photos[0]} alt={listing.title} style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 10, marginBottom: 10 }} />
-                    {photos.length > 1 && (
-                      <span style={{
-                        position: 'absolute', bottom: 18, right: 8,
-                        background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 11, fontWeight: 600,
-                        padding: '2px 8px', borderRadius: 999,
-                      }}>
-                        +{photos.length - 1} more
-                      </span>
-                    )}
+                <div style={{ position: 'relative' }}>
+                  {photos[0] ? (
+                    <>
+                      <img src={photos[0]} alt={listing.title} style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 10, marginBottom: 10 }} />
+                      {photos.length > 1 && (
+                        <span style={{
+                          position: 'absolute', bottom: 18, right: 8,
+                          background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 11, fontWeight: 600,
+                          padding: '2px 8px', borderRadius: 999,
+                        }}>
+                          +{photos.length - 1} more
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <PhotoPlaceholder />
+                  )}
+                  <div style={{ position: 'absolute', top: 8, right: 8 }}>
+                    <SaveButton rentListingId={listing.id} initiallySaved={savedIds.includes(listing.id)} />
                   </div>
-                ) : (
-                  <PhotoPlaceholder />
-                )}
+                </div>
 
                 <span className="badge badge-green" style={{ marginBottom: 6 }}>
                   {listing.type === 'room' ? 'Room' : 'Whole place'}
@@ -280,4 +290,4 @@ export default function RentPage() {
       </div>
     </main>
   );
-}
+  }
