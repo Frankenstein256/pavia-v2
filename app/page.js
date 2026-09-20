@@ -1,7 +1,7 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
-import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -32,6 +32,19 @@ export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const [popular, setPopular] = useState([]);
+  const [loadingPopular, setLoadingPopular] = useState(true);
+
+  useEffect(() => {
+    if (session) {
+      fetch('/api/popular')
+        .then((res) => res.json())
+        .then((data) => {
+          setPopular(Array.isArray(data) ? data : []);
+          setLoadingPopular(false);
+        });
+    }
+  }, [session]);
 
   function handleSearch(e) {
     e.preventDefault();
@@ -74,7 +87,7 @@ export default function Home() {
       </form>
 
       <h2 style={{ color: 'var(--color-text)', marginBottom: 14 }}>Explore Pavia</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 32 }}>
         {categories.map((c) => (
           <Link key={c.href} href={c.href} style={{ textDecoration: 'none' }}>
             <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -92,6 +105,41 @@ export default function Home() {
           </Link>
         ))}
       </div>
+
+      {!loadingPopular && popular.length > 0 && (
+        <>
+          <h2 style={{ color: 'var(--color-text)', marginBottom: 14 }}>Popular near you</h2>
+          <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, marginBottom: 8 }}>
+            {popular.map((item) => (
+              <Link key={`${item.kind}-${item.id}`} href={item.href} style={{ textDecoration: 'none', flexShrink: 0, width: 160 }}>
+                <div className="card" style={{ padding: 10 }}>
+                  {item.photo ? (
+                    <img src={item.photo} alt={item.title} style={{ width: '100%', height: 90, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }} />
+                  ) : (
+                    <div style={{
+                      width: '100%', height: 90, borderRadius: 8, marginBottom: 8,
+                      background: '#EAF3EE', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        {item.kind === 'work' ? (
+                          <><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></>
+                        ) : (
+                          <><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z" /><circle cx="12" cy="10" r="2.5" /></>
+                        )}
+                      </svg>
+                    </div>
+                  )}
+                  <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {item.title}
+                  </p>
+                  <p style={{ fontSize: 11, color: 'var(--color-text-muted)', marginBottom: 4 }}>{item.subtitle}</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)' }}>{item.price}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </main>
   );
     }
