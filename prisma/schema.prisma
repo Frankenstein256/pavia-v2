@@ -22,6 +22,7 @@ model User {
   sellerChats     Conversation[] @relation("ConversationSeller")
   reviewsGiven    Review[]       @relation("ReviewsGiven")
   reviewsReceived Review[]       @relation("ReviewsReceived")
+  savedListings   SavedListing[]
   createdAt       DateTime  @default(now())
 }
 
@@ -111,6 +112,18 @@ model Review {
   reviewee   User     @relation("ReviewsReceived", fields: [revieweeId], references: [id], onDelete: Cascade)
 
   @@unique([reviewerId, revieweeId])
+}
+
+model SavedListing {
+  id            String   @id @default(cuid())
+  userId        String
+  listingId     String?
+  rentListingId String?
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@unique([userId, rentListingId])
 }
 
 model RentListing {
