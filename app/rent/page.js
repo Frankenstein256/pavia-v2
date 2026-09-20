@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import RentMessageButton from './RentMessageButton';
 
@@ -17,10 +17,23 @@ function PhotoPlaceholder() {
   );
 }
 
+function SkeletonCard() {
+  return (
+    <div className="card">
+      <div className="skeleton" style={{ width: '100%', height: 180, marginBottom: 10 }} />
+      <div className="skeleton" style={{ width: 70, height: 20, marginBottom: 8 }} />
+      <div className="skeleton" style={{ width: '80%', height: 20, marginBottom: 8 }} />
+      <div className="skeleton" style={{ width: '50%', height: 14, marginBottom: 10 }} />
+      <div className="skeleton" style={{ width: '40%', height: 22 }} />
+    </div>
+  );
+}
+
 export default function RentPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [activeType, setActiveType] = useState('All');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('room');
@@ -101,7 +114,10 @@ export default function RentPage() {
     loadListings();
   }
 
-  if (loading) return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></main>;
+  const filtered = useMemo(() => {
+    if (activeType === 'All') return listings;
+    return listings.filter((l) => l.type === activeType);
+  }, [listings, activeType]);
 
   return (
     <main className="page-container">
@@ -111,7 +127,7 @@ export default function RentPage() {
           {showForm ? 'Cancel' : '+ List a place'}
         </button>
       </div>
-      <p style={{ color: 'var(--color-text-muted)', marginBottom: 20 }}>
+      <p style={{ color: 'var(--color-text-muted)', marginBottom: 16 }}>
         Browse rooms and apartments listed by real people.
       </p>
 
@@ -168,15 +184,44 @@ export default function RentPage() {
         </form>
       )}
 
+      {!loading && listings.length > 0 && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+          {['All', 'room', 'apartment'].map((t) => (
+            <button
+              key={t}
+              onClick={() => setActiveType(t)}
+              className={activeType === t ? '' : 'btn-secondary'}
+              style={{ fontSize: 13, padding: '6px 14px' }}
+            >
+              {t === 'All' ? 'All' : t === 'room' ? 'Room' : 'Whole place'}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {listings.length === 0 && (
+        {loading && (
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
+        )}
+
+        {!loading && listings.length === 0 && (
           <div className="card" style={{ textAlign: 'center' }}>
             <h3 style={{ marginBottom: 4 }}>No listings yet</h3>
             <p style={{ color: 'var(--color-text-muted)' }}>Be the first to list a place.</p>
           </div>
         )}
 
-        {listings.map((listing) => {
+        {!loading && listings.length > 0 && filtered.length === 0 && (
+          <div className="card" style={{ textAlign: 'center' }}>
+            <h3 style={{ marginBottom: 4 }}>No matches</h3>
+            <p style={{ color: 'var(--color-text-muted)' }}>Try a different filter.</p>
+          </div>
+        )}
+
+        {filtered.map((listing) => {
           const photos = listing.photoUrls ? listing.photoUrls.split(',').map((p) => p.trim()) : [];
           return (
             <div key={listing.id} className="card">
