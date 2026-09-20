@@ -1,8 +1,9 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import MessageButton from './MessageButton';
+import SaveButton from '../SaveButton';
 
 function Stars({ rating, count }) {
   return (
@@ -16,6 +17,13 @@ export default function WorkList({ listings }) {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [savedIds, setSavedIds] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/saved/check')
+      .then((res) => res.json())
+      .then((data) => setSavedIds(data.listingIds || []));
+  }, []);
 
   const categories = useMemo(() => {
     const set = new Set(listings.map((l) => l.category).filter(Boolean));
@@ -65,10 +73,13 @@ export default function WorkList({ listings }) {
                 {listing.category && <span className="badge badge-green" style={{ marginBottom: 6 }}>{listing.category}</span>}
                 <h3 style={{ color: 'var(--color-text)', margin: '2px 0 4px' }}>{listing.title}</h3>
               </div>
-              <p style={{ fontWeight: 700, color: 'var(--color-primary)', whiteSpace: 'nowrap' }}>
-                {listing.price ? `GH₵${listing.price}` : 'Negotiable'}
-                {listing.priceType === 'hourly' ? '/hr' : ''}
-              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                <p style={{ fontWeight: 700, color: 'var(--color-primary)', whiteSpace: 'nowrap' }}>
+                  {listing.price ? `GH₵${listing.price}` : 'Negotiable'}
+                  {listing.priceType === 'hourly' ? '/hr' : ''}
+                </p>
+                <SaveButton listingId={listing.id} initiallySaved={savedIds.includes(listing.id)} />
+              </div>
             </div>
             {listing.location && (
               <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginBottom: 6 }}>📍 {listing.location}</p>
@@ -105,4 +116,4 @@ export default function WorkList({ listings }) {
       </div>
     </>
   );
-      }
+              }
