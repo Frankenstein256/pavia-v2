@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ProfilePage() {
   const { data: session, update } = useSession();
@@ -46,6 +47,8 @@ export default function ProfilePage() {
 
   if (!session) return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></main>;
 
+  const isAdmin = session.user.email === 'frankletsu60@gmail.com';
+
   return (
     <main className="page-container">
       <h1 style={{ color: 'var(--color-primary)', marginBottom: 24 }}>Profile</h1>
@@ -82,9 +85,21 @@ export default function ProfilePage() {
         {error && <p style={{ color: 'var(--color-danger)', fontSize: 13, marginTop: 8 }}>{error}</p>}
       </div>
 
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+        <Link href="/profile/my-listings">
+          <button className="btn-secondary" style={{ width: '100%' }}>My Listings</button>
+        </Link>
+
+        {isAdmin && (
+          <Link href="/admin/courses">
+            <button className="btn-secondary" style={{ width: '100%' }}>Review Courses (Admin)</button>
+          </Link>
+        )}
+      </div>
+
       <button onClick={() => signOut({ callbackUrl: '/' })} className="btn-secondary" style={{ width: '100%' }}>
         Log out
       </button>
     </main>
   );
-    }
+              } 
