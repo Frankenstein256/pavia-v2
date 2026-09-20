@@ -1,9 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SearchPage() {
+function SearchInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialQ = searchParams.get('q') || '';
@@ -107,4 +107,12 @@ export default function SearchPage() {
       )}
     </main>
   );
-  }
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></main>}>
+      <SearchInner />
+    </Suspense>
+  );
+        }
