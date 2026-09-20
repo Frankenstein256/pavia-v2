@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET(req, { params }) {
   const course = await prisma.course.findUnique({
     where: { id: params.courseId },
-    include: { questions: true },
+    include: { questions: { orderBy: { order: 'asc' } } },
   });
 
   if (!course) {
