@@ -90,6 +90,10 @@ export default function ProfilePage() {
           <button className="btn-secondary" style={{ width: '100%' }}>My Listings</button>
         </Link>
 
+        <Link href="/saved">
+          <button className="btn-secondary" style={{ width: '100%' }}>Saved</button>
+        </Link>
+
         {isAdmin && (
           <Link href="/admin/courses">
             <button className="btn-secondary" style={{ width: '100%' }}>Review Courses (Admin)</button>
@@ -102,4 +106,4 @@ export default function ProfilePage() {
       </button>
     </main>
   );
-              } 
+            }
