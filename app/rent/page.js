@@ -280,4 +280,4 @@ export default function RentPage() {
       </div>
     </main>
   );
-  }
+}
