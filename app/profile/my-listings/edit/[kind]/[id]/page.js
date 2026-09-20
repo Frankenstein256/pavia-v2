@@ -11,6 +11,7 @@ export default function EditListingPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
   const [title, setTitle] = useState('');
@@ -23,6 +24,7 @@ export default function EditListingPage() {
 
   const [type, setType] = useState('room');
   const [rentLocation, setRentLocation] = useState('');
+  const [photoUrls, setPhotoUrls] = useState('');
 
   const labelStyle = { display: 'block', marginBottom: 6, fontSize: 13, color: 'var(--color-text-muted)', fontWeight: 600 };
   const fieldWrap = { marginBottom: 16 };
@@ -42,10 +44,40 @@ export default function EditListingPage() {
         } else {
           setType(data.type || 'room');
           setRentLocation(data.location || '');
+          setPhotoUrls(data.photoUrls || '');
         }
         setLoading(false);
       });
   }, [id, isWork]);
+
+  async function handlePhotoChange(e) {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setUploading(true);
+    setError('');
+    const uploadedUrls = [];
+
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        uploadedUrls.push(data.url);
+      } else {
+        setError('Failed to upload one or more photos');
+      }
+    }
+
+    setPhotoUrls((prev) => (prev ? prev + ',' + uploadedUrls.join(',') : uploadedUrls.join(',')));
+    setUploading(false);
+  }
+
+  function removePhoto(urlToRemove) {
+    const remaining = photoUrls.split(',').map((u) => u.trim()).filter((u) => u !== urlToRemove);
+    setPhotoUrls(remaining.join(','));
+  }
 
   async function handleSave(e) {
     e.preventDefault();
@@ -55,7 +87,7 @@ export default function EditListingPage() {
     const url = isWork ? `/api/listings/${id}` : `/api/rentals/${id}`;
     const body = isWork
       ? { title, description, category, price, priceType, location }
-      : { title, description, type, price, location: rentLocation, photoUrls: undefined };
+      : { title, description, type, price, location: rentLocation, photoUrls };
 
     const res = await fetch(url, {
       method: 'PATCH',
@@ -137,14 +169,40 @@ export default function EditListingPage() {
               <label style={labelStyle}>Location</label>
               <input type="text" value={rentLocation} onChange={(e) => setRentLocation(e.target.value)} required />
             </div>
+
+            <div style={fieldWrap}>
+              <label style={labelStyle}>Photos</label>
+              <input type="file" accept="image/*" multiple onChange={handlePhotoChange} />
+              {uploading && <p style={{ color: 'var(--color-text-muted)', fontSize: 13, marginTop: 6 }}>Uploading...</p>}
+              {photoUrls && (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+                  {photoUrls.split(',').map((url, i) => (
+                    <div key={i} style={{ position: 'relative' }}>
+                      <img src={url.trim()} alt="preview" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }} />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(url.trim())}
+                        style={{
+                          position: 'absolute', top: -6, right: -6,
+                          width: 20, height: 20, borderRadius: '50%', padding: 0,
+                          background: 'var(--color-danger)', fontSize: 12, lineHeight: '20px',
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </>
         )}
 
         {error && <p style={{ color: 'var(--color-danger)', fontSize: 14, marginBottom: 12 }}>{error}</p>}
-        <button type="submit" disabled={saving} style={{ width: '100%' }}>
+        <button type="submit" disabled={saving || uploading} style={{ width: '100%' }}>
           {saving ? 'Saving...' : 'Save changes'}
         </button>
       </form>
     </main>
   );
-      }
+}
