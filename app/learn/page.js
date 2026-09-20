@@ -2,6 +2,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
+function SkeletonCourseCard() {
+  return (
+    <div className="card">
+      <div className="skeleton" style={{ width: '100%', height: 140, marginBottom: 10 }} />
+      <div className="skeleton" style={{ width: '70%', height: 20, marginBottom: 8 }} />
+      <div className="skeleton" style={{ width: '90%', height: 14 }} />
+    </div>
+  );
+}
+
 export default function LearnPage() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,16 +43,21 @@ export default function LearnPage() {
         </Link>
       </div>
 
-      {loading && <p style={{ color: 'var(--color-text-muted)' }}>Loading courses...</p>}
-
-      {!loading && courses.length === 0 && (
-        <div className="card" style={{ textAlign: 'center' }}>
-          <h3 style={{ marginBottom: 4 }}>No courses yet</h3>
-          <p style={{ color: 'var(--color-text-muted)' }}>Check back soon, or submit one yourself.</p>
-        </div>
-      )}
-
       <div style={{ display: 'grid', gap: 12 }}>
+        {loading && (
+          <>
+            <SkeletonCourseCard />
+            <SkeletonCourseCard />
+          </>
+        )}
+
+        {!loading && courses.length === 0 && (
+          <div className="card" style={{ textAlign: 'center' }}>
+            <h3 style={{ marginBottom: 4 }}>No courses yet</h3>
+            <p style={{ color: 'var(--color-text-muted)' }}>Check back soon, or submit one yourself.</p>
+          </div>
+        )}
+
         {courses.map(course => (
           <Link key={course.id} href={`/learn/${course.id}`} style={{ textDecoration: 'none' }}>
             <div className="card">
