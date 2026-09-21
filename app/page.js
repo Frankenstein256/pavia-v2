@@ -48,7 +48,7 @@ export default function Home() {
 
   function handleSearch(e) {
     e.preventDefault();
-    router.push(`/work${query ? `?q=${encodeURIComponent(query)}` : ''}`);
+    router.push(`/search${query ? `?q=${encodeURIComponent(query)}` : ''}`);
   }
 
   if (status === 'loading') {
@@ -78,7 +78,7 @@ export default function Home() {
 
       <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8, marginBottom: 32 }}>
         <input
-          placeholder="Search skills..."
+          placeholder="Search skills, places, courses..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{ flex: 1, minWidth: 0 }}
