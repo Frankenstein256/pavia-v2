@@ -1,15 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      window.location.href = '/';
+    }
+  }, [status]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -25,24 +32,27 @@ export default function LoginPage() {
     setLoading(false);
 
     if (res?.ok) {
-      router.push('/');
+      window.location.href = '/';
     } else {
       setError('Invalid email or password');
     }
   }
 
-  return (
-    <main style={{ maxWidth: 400, margin: '4rem auto', padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h1>Log in to Pavia</h1>
+  if (status === 'loading' || status === 'authenticated') {
+    return <main className="page-container"><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></main>;
+  }
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
+  return (
+    <main className="page-container" style={{ maxWidth: 400, marginTop: '4rem' }}>
+      <h1 style={{ color: 'var(--color-primary)', marginBottom: 20 }}>Log in to Pavia</h1>
+
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ padding: '0.6rem' }}
         />
         <input
           type="password"
@@ -50,28 +60,28 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ padding: '0.6rem' }}
         />
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: 'var(--color-danger)' }}>{error}</p>}
 
-        <button type="submit" disabled={loading} style={{ padding: '0.7rem', cursor: 'pointer' }}>
+        <button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Log in'}
         </button>
       </form>
 
-      <div style={{ margin: '1.5rem 0', textAlign: 'center' }}>or</div>
+      <div style={{ margin: '1.5rem 0', textAlign: 'center', color: 'var(--color-text-muted)' }}>or</div>
 
       <button
         onClick={() => signIn('google', { callbackUrl: '/' })}
-        style={{ width: '100%', padding: '0.7rem', cursor: 'pointer' }}
+        className="btn-secondary"
+        style={{ width: '100%' }}
       >
         Continue with Google
       </button>
 
-      <p style={{ marginTop: '1.5rem' }}>
-        Don't have an account? <a href="/register">Sign up</a>
+      <p style={{ marginTop: '1.5rem', color: 'var(--color-text-muted)' }}>
+        Don't have an account? <a href="/register" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>Sign up</a>
       </p>
     </main>
   );
-}
+            }
